@@ -1,6 +1,6 @@
-# 🏥 Healthcare News Automation
+# 🧬 Healthcare Writeups
 
-**Professional healthcare news analysis and reporting system that automatically analyzes articles from Life Science Report and generates comprehensive investment-grade reports.**
+**AI-powered daily healthcare news analysis platform that generates comprehensive investment intelligence writeups from Life Science Report and other healthcare sources.**
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-green.svg)](https://flask.palletsprojects.com/)

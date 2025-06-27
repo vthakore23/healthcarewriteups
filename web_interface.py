@@ -127,19 +127,6 @@ def view_report(filename):
         flash(f'Error viewing report: {str(e)}', 'error')
         return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    # Create templates directory if it doesn't exist
-    os.makedirs('templates', exist_ok=True)
-    
-    # Create the HTML template
-    create_dashboard_template()
-    
-    print("🚀 Healthcare News Automation Interface")
-    print("📊 Starting web interface at http://localhost:5000")
-    print("💡 Use this interface to run analysis and download reports")
-    
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
 def create_dashboard_template():
     """Create the dashboard HTML template"""
     template_content = '''<!DOCTYPE html>
@@ -147,7 +134,7 @@ def create_dashboard_template():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare News Automation</title>
+    <title>Healthcare Writeups - Daily Analysis Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -157,37 +144,79 @@ def create_dashboard_template():
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3c72 25%, #2a3b70 50%, #1a237e 100%);
             color: #333;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dna" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.03)"/><circle cx="12.5" cy="12.5" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="37.5" cy="37.5" r="1" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23dna)"/></svg>') repeat;
+            z-index: -1;
+            pointer-events: none;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 45px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid #e3f2fd;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #1976d2, #42a5f5);
+            border-radius: 3px;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            color: #2c3e50;
-            margin-bottom: 10px;
+            font-size: 2.8em;
+            background: linear-gradient(135deg, #1565c0, #1976d2, #42a5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
         
         .header p {
-            font-size: 1.2em;
-            color: #7f8c8d;
+            font-size: 1.3em;
+            color: #546e7a;
+            font-weight: 400;
+        }
+        
+        .medical-icon {
+            display: inline-block;
+            margin-right: 12px;
+            font-size: 1.1em;
+            color: #1976d2;
         }
         
         .controls {
@@ -210,18 +239,43 @@ def create_dashboard_template():
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background: linear-gradient(135deg, #1565c0, #1976d2, #1e88e5);
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+            background: linear-gradient(135deg, #1976d2, #1e88e5, #2196f3);
         }
         
         .btn-secondary {
-            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            background: linear-gradient(135deg, #455a64, #546e7a);
             color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #546e7a, #607d8b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(84, 110, 122, 0.3);
         }
         
         .btn:disabled {
@@ -338,18 +392,18 @@ def create_dashboard_template():
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏥 Healthcare News Automation</h1>
-            <p>Generate comprehensive healthcare news analysis reports</p>
+            <h1><span class="medical-icon">🧬</span>Healthcare Writeups<span class="medical-icon">📊</span></h1>
+            <p>AI-Powered Daily Healthcare News Analysis & Investment Intelligence</p>
         </div>
         
         <div class="controls">
             <button id="runAnalysis" class="btn btn-primary" onclick="runAnalysis()">
-                <span class="emoji">🚀</span>
-                Run Full Analysis
+                <span class="emoji">🔬</span>
+                Generate Daily Writeups
             </button>
             <button class="btn btn-secondary" onclick="location.reload()">
-                <span class="emoji">🔄</span>
-                Refresh
+                <span class="emoji">📈</span>
+                Refresh Dashboard
             </button>
         </div>
         
@@ -363,31 +417,31 @@ def create_dashboard_template():
         
         {% if reports %}
         <div class="reports-section">
-            <h2>📋 Recent Reports</h2>
+            <h2>🗂️ Healthcare Analysis Archive</h2>
             <div class="reports-grid">
                 {% for report in reports %}
                 <div class="report-card">
                     <div class="report-date">📅 {{ report.date }}</div>
                     <div class="report-meta">
-                        Created: {{ report.created.strftime('%I:%M %p') }}<br>
-                        Size: {{ "%.1f"|format(report.size/1024) }} KB
+                        <span class="medical-icon">🕒</span>Generated: {{ report.created.strftime('%I:%M %p') }}<br>
+                        <span class="medical-icon">📊</span>Size: {{ "%.1f"|format(report.size/1024) }} KB
                     </div>
                     <div class="report-actions">
                         <a href="{{ url_for('view_report', filename=report.html_file) }}" 
                            class="btn btn-primary btn-small" target="_blank">
-                            <span class="emoji">👁️</span>
-                            View
+                            <span class="emoji">🔬</span>
+                            View Analysis
                         </a>
                         <a href="{{ url_for('download_file', filename=report.html_file) }}" 
                            class="btn btn-secondary btn-small">
-                            <span class="emoji">⬇️</span>
-                            Download HTML
+                            <span class="emoji">📋</span>
+                            Download Report
                         </a>
                         {% if report.json_file %}
                         <a href="{{ url_for('download_file', filename=report.json_file) }}" 
                            class="btn btn-secondary btn-small">
-                            <span class="emoji">📄</span>
-                            JSON
+                            <span class="emoji">🧬</span>
+                            Raw Data
                         </a>
                         {% endif %}
                     </div>
@@ -397,7 +451,7 @@ def create_dashboard_template():
         </div>
         {% else %}
         <div class="alert alert-info">
-            <strong>📝 No reports yet!</strong> Run your first analysis to generate reports.
+            <strong>🔬 Ready for Analysis!</strong> Generate your first healthcare writeups to begin tracking market intelligence.
         </div>
         {% endif %}
     </div>
@@ -410,7 +464,7 @@ def create_dashboard_template():
             const statusCard = document.getElementById('statusCard');
             
             button.disabled = true;
-            button.innerHTML = '<div class="loading"></div> Running Analysis...';
+            button.innerHTML = '<div class="loading"></div> Analyzing Healthcare Market...';
             statusCard.style.display = 'block';
             
             fetch('/run-analysis', {
@@ -476,4 +530,17 @@ def create_dashboard_template():
     
     # Write the template
     with open('templates/dashboard.html', 'w') as f:
-        f.write(template_content) 
+        f.write(template_content)
+
+if __name__ == '__main__':
+    # Create templates directory if it doesn't exist
+    os.makedirs('templates', exist_ok=True)
+    
+    # Create the HTML template
+    create_dashboard_template()
+    
+    print("🚀 Healthcare News Automation Interface")
+    print("📊 Starting web interface at http://localhost:5001")
+    print("💡 Use this interface to run analysis and download reports")
+    
+    app.run(debug=True, host='0.0.0.0', port=5001) 

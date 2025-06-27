@@ -21,7 +21,7 @@ else
 fi
 
 echo "🌐 Starting Healthcare News Automation Interface..."
-echo "📊 You can access the interface at: http://localhost:5000"
+echo "📊 You can access the interface at: http://localhost:5001"
 echo "💡 Use the web interface to:"
 echo "   • Run full healthcare news analysis"
 echo "   • View and download reports"
@@ -32,7 +32,7 @@ echo "   Press Ctrl+C to stop the server"
 echo ""
 
 # Open browser automatically (works on macOS)
-sleep 3 && open http://localhost:5000 &
+sleep 3 && open http://localhost:5001 &
 
 # Start the Flask web interface
 python3 web_interface.py 
