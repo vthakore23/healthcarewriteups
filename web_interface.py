@@ -134,8 +134,30 @@ def create_dashboard_template():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare Writeups - Daily Analysis Dashboard</title>
+    <title>Healthcare Writeups - Investment Intelligence Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-teal: #14b8a6;
+            --accent-purple: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.2);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="dark"] {
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --glass-bg: rgba(0, 0, 0, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -143,13 +165,21 @@ def create_dashboard_template():
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #2c5aa0 0%, #1e3c72 25%, #2a3b70 50%, #1a237e 100%);
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #667eea 50%, #764ba2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             overflow-x: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         body::before {
@@ -159,90 +189,197 @@ def create_dashboard_template():
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dna" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.03)"/><circle cx="12.5" cy="12.5" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="37.5" cy="37.5" r="1" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23dna)"/></svg>') repeat;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="1.5" fill="rgba(255,255,255,0.03)"/><path d="M25 30h10M30 25v10" stroke="rgba(255,255,255,0.02)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23medical)"/></svg>') repeat;
             z-index: -1;
             pointer-events: none;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+        /* Top Navigation Bar */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .theme-toggle {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 8px 16px 8px 8px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 100px auto 0;
+            background: var(--glass-bg);
+            border-radius: 32px;
+            padding: 48px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-teal), var(--accent-purple), transparent);
         }
         
         .header {
             text-align: center;
-            margin-bottom: 45px;
-            padding-bottom: 25px;
-            border-bottom: 3px solid #e3f2fd;
+            margin-bottom: 56px;
+            padding-bottom: 32px;
             position: relative;
         }
         
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: linear-gradient(90deg, #1976d2, #42a5f5);
-            border-radius: 3px;
-        }
-        
         .header h1 {
-            font-size: 2.8em;
-            background: linear-gradient(135deg, #1565c0, #1976d2, #42a5f5);
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 12px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.1;
         }
         
         .header p {
-            font-size: 1.3em;
-            color: #546e7a;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
             font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
         
         .medical-icon {
             display: inline-block;
-            margin-right: 12px;
-            font-size: 1.1em;
-            color: #1976d2;
+            margin: 0 8px;
+            font-size: 1.2em;
+            animation: pulse 2s infinite;
         }
         
-        .controls {
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Action Bar */
+        .action-bar {
+            position: sticky;
+            top: 80px;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px 32px;
+            margin-bottom: 40px;
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            box-shadow: var(--shadow-soft);
         }
         
         .btn {
-            padding: 15px 30px;
+            padding: 16px 32px;
             border: none;
-            border-radius: 10px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #1565c0, #1976d2, #1e88e5);
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
             color: white;
-            position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-soft);
         }
         
         .btn-primary::before {
@@ -252,8 +389,8 @@ def create_dashboard_template():
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .btn-primary:hover::before {
@@ -261,21 +398,43 @@ def create_dashboard_template():
         }
         
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
-            background: linear-gradient(135deg, #1976d2, #1e88e5, #2196f3);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(20, 184, 166, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-2px) scale(0.98);
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #455a64, #546e7a);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
         }
         
         .btn-secondary:hover {
-            background: linear-gradient(135deg, #546e7a, #607d8b);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(84, 110, 122, 0.3);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-soft);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn .emoji {
+            font-size: 18px;
+            transition: var(--transition-smooth);
+        }
+        
+        .btn:hover .emoji {
+            transform: scale(1.2) rotate(5deg);
         }
         
         .btn:disabled {
@@ -283,97 +442,212 @@ def create_dashboard_template():
             cursor: not-allowed;
         }
         
+        /* Status Card with Glassmorphism */
         .status-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border-left: 5px solid #3498db;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-purple));
+        }
+        
+        .status-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background: #ecf0f1;
-            border-radius: 5px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             overflow: hidden;
-            margin: 15px 0;
+            margin: 20px 0;
+            position: relative;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-purple));
+            border-radius: 8px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Reports Grid */
+        .reports-section {
+            margin-top: 48px;
+        }
+        
+        .reports-section h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            text-align: center;
         }
         
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
         }
         
         .report-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border: 1px solid #e0e0e0;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-teal), transparent);
+            opacity: 0;
+            transition: var(--transition-smooth);
+        }
+        
+        .report-card:hover::before {
+            opacity: 1;
         }
         
         .report-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-strong);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
         
         .report-date {
-            font-size: 1.1em;
+            font-size: 1.25rem;
             font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-badge {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .report-meta {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-bottom: 15px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
         }
         
         .report-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         
         .btn-small {
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-size: 14px;
+            border-radius: 12px;
+            font-weight: 500;
         }
         
+        .btn-small .emoji {
+            font-size: 16px;
+        }
+        
+        /* Alerts and Notifications */
         .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .alert-info {
+            border-left: 4px solid var(--accent-teal);
         }
         
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            border-left: 4px solid #10b981;
+            color: #065f46;
         }
         
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
         }
         
+        /* Loading Animations */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid var(--accent-teal);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -383,20 +657,97 @@ def create_dashboard_template():
             100% { transform: rotate(360deg); }
         }
         
-        .emoji {
-            font-size: 1.2em;
-            margin-right: 8px;
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 80px;
+                padding: 24px;
+                border-radius: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .nav-controls {
+                gap: 12px;
+            }
+        }
+        
+        /* Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-purple));
+            border-radius: 8px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-teal));
         }
     </style>
 </head>
 <body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo">🧬 Healthcare Writeups</div>
+        <div class="nav-controls">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                🌙
+            </button>
+            <div class="user-profile" onclick="showProfile()">
+                <div class="avatar">VT</div>
+                <span style="color: var(--text-primary); font-weight: 500;">Welcome, Vijay</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1><span class="medical-icon">🧬</span>Healthcare Writeups<span class="medical-icon">📊</span></h1>
-            <p>AI-Powered Daily Healthcare News Analysis & Investment Intelligence</p>
+            <p>AI-Powered Daily Healthcare News Analysis & Investment Intelligence Platform</p>
         </div>
         
-        <div class="controls">
+        <!-- Sticky Action Bar -->
+        <div class="action-bar">
             <button id="runAnalysis" class="btn btn-primary" onclick="runAnalysis()">
                 <span class="emoji">🔬</span>
                 Generate Daily Writeups
@@ -421,10 +772,16 @@ def create_dashboard_template():
             <div class="reports-grid">
                 {% for report in reports %}
                 <div class="report-card">
-                    <div class="report-date">📅 {{ report.date }}</div>
+                    <div class="report-header">
+                        <div class="report-date">
+                            📅 {{ report.date }}
+                        </div>
+                        <div class="status-badge">NEW</div>
+                    </div>
                     <div class="report-meta">
                         <span class="medical-icon">🕒</span>Generated: {{ report.created.strftime('%I:%M %p') }}<br>
-                        <span class="medical-icon">📊</span>Size: {{ "%.1f"|format(report.size/1024) }} KB
+                        <span class="medical-icon">📊</span>Analysis Size: {{ "%.1f"|format(report.size/1024) }} KB<br>
+                        <span class="medical-icon">💊</span>Investment Intelligence Report
                     </div>
                     <div class="report-actions">
                         <a href="{{ url_for('view_report', filename=report.html_file) }}" 
@@ -451,7 +808,11 @@ def create_dashboard_template():
         </div>
         {% else %}
         <div class="alert alert-info">
-            <strong>🔬 Ready for Analysis!</strong> Generate your first healthcare writeups to begin tracking market intelligence.
+            <span style="font-size: 1.5rem;">🔬</span>
+            <div>
+                <strong>Ready for Analysis!</strong><br>
+                Generate your first healthcare writeups to begin tracking market intelligence and investment opportunities.
+            </div>
         </div>
         {% endif %}
     </div>
@@ -459,13 +820,56 @@ def create_dashboard_template():
     <script>
         let statusInterval;
         
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeToggle.innerHTML = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️';
+            }
+        });
+        
+        function showProfile() {
+            alert('Profile menu coming soon! 👨‍💼');
+        }
+        
         function runAnalysis() {
             const button = document.getElementById('runAnalysis');
             const statusCard = document.getElementById('statusCard');
             
             button.disabled = true;
             button.innerHTML = '<div class="loading"></div> Analyzing Healthcare Market...';
-            statusCard.style.display = 'block';
+            
+            // Show status card with animation
+            if (statusCard) {
+                statusCard.style.display = 'block';
+                statusCard.style.opacity = '0';
+                statusCard.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    statusCard.style.transition = 'all 0.5s ease';
+                    statusCard.style.opacity = '1';
+                    statusCard.style.transform = 'translateY(0)';
+                }, 100);
+            }
             
             fetch('/run-analysis', {
                 method: 'POST',
@@ -484,8 +888,23 @@ def create_dashboard_template():
             })
             .catch(error => {
                 button.disabled = false;
-                button.innerHTML = '<span class="emoji">🚀</span> Run Full Analysis';
-                alert('Error starting analysis: ' + error.message);
+                button.innerHTML = '<span class="emoji">🔬</span> Generate Daily Writeups';
+                
+                // Show error with better UX
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-error';
+                errorAlert.innerHTML = `
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <div>
+                        <strong>Analysis Error</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                
+                const container = document.querySelector('.container');
+                container.insertBefore(errorAlert, container.firstChild);
+                
+                setTimeout(() => errorAlert.remove(), 5000);
             });
         }
         
@@ -498,25 +917,46 @@ def create_dashboard_template():
                 const statusDetails = document.getElementById('statusDetails');
                 const button = document.getElementById('runAnalysis');
                 
-                statusMessage.textContent = status.message;
-                progressFill.style.width = status.progress + '%';
+                if (statusMessage) statusMessage.textContent = status.message;
+                if (progressFill) progressFill.style.width = status.progress + '%';
                 
                 if (!status.running) {
                     clearInterval(statusInterval);
                     button.disabled = false;
-                    button.innerHTML = '<span class="emoji">🚀</span> Run Full Analysis';
+                    button.innerHTML = '<span class="emoji">🔬</span> Generate Daily Writeups';
                     
-                    if (status.error) {
+                    if (status.error && statusDetails) {
                         statusDetails.textContent = 'Error: ' + status.error;
-                        statusDetails.style.color = '#e74c3c';
-                    } else if (status.results) {
-                        statusDetails.textContent = 'Analysis completed! Refresh to see new reports.';
-                        statusDetails.style.color = '#27ae60';
+                        statusDetails.style.color = '#ef4444';
+                    } else if (status.results && statusDetails) {
+                        statusDetails.textContent = '✅ Analysis completed! Refreshing to show new reports...';
+                        statusDetails.style.color = '#10b981';
                         
-                        // Auto-refresh after 3 seconds
-                        setTimeout(() => {
-                            location.reload();
-                        }, 3000);
+                        // Success notification
+                        const successAlert = document.createElement('div');
+                        successAlert.className = 'alert alert-success';
+                        successAlert.innerHTML = `
+                            <span style="font-size: 1.5rem;">🎉</span>
+                            <div>
+                                <strong>Analysis Complete!</strong><br>
+                                Your healthcare writeups have been generated successfully.
+                            </div>
+                        `;
+                        
+                        const container = document.querySelector('.container');
+                        container.insertBefore(successAlert, container.firstChild);
+                        
+                        // Auto-refresh with countdown
+                        let countdown = 3;
+                        const countdownInterval = setInterval(() => {
+                            statusDetails.textContent = `✅ Analysis completed! Refreshing in ${countdown}s...`;
+                            countdown--;
+                            
+                            if (countdown < 0) {
+                                clearInterval(countdownInterval);
+                                location.reload();
+                            }
+                        }, 1000);
                     }
                 }
             })
@@ -524,6 +964,22 @@ def create_dashboard_template():
                 console.error('Error checking status:', error);
             });
         }
+        
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate elements on page load
+            const cards = document.querySelectorAll('.report-card, .alert');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
     </script>
 </body>
 </html>'''
