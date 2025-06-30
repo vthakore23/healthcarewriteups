@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Social Media Intelligence Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2962ff;
+            --success-color: #00c853;
+            --warning-color: #ff6d00;
+            --danger-color: #d50000;
+            --dark-bg: #0a0e27;
+            --card-bg: #151a30;
+            --hover-bg: #1a2038;
+            --text-light: #ffffff;
+            --text-muted: #8892b0;
+            --border-color: #233554;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(to right, var(--card-bg), var(--hover-bg));
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light) !important;
+        }
+
+        .container-fluid {
+            max-width: 1400px;
+            padding: 0 2rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--hover-bg) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            margin-top: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-item-name {
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .search-item-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Feature Tabs */
+        .feature-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .feature-tab {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-tab:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .feature-tab.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #651fff 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Sentiment Badges */
+        .sentiment-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sentiment-positive {
+            background-color: rgba(0, 200, 83, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(0, 200, 83, 0.3);
+        }
+
+        .sentiment-negative {
+            background-color: rgba(213, 0, 0, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(213, 0, 0, 0.3);
+        }
+
+        .sentiment-neutral {
+            background-color: rgba(255, 109, 0, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(255, 109, 0, 0.3);
+        }
+
+        /* Loading States */
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Lists */
+        .insight-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .insight-list li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+
+        .insight-icon {
+            font-size: 1.25rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Sample Posts */
+        .sample-post {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .post-platform {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .post-date {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .post-content {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Charts */
+        .plotly-graph-div {
+            margin: -1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-section {
+                padding: 2rem 1rem;
+            }
+            
+            .metric-card {
+                padding: 1.5rem;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+        }
+
+        /* Utility Classes */
+        .text-success { color: var(--success-color) !important; }
+        .text-danger { color: var(--danger-color) !important; }
+        .text-warning { color: var(--warning-color) !important; }
+        .text-primary { color: var(--primary-color) !important; }
+        
+        /* Error State */
+        .error-message {
+            background-color: rgba(213, 0, 0, 0.1);
+            border: 1px solid rgba(213, 0, 0, 0.3);
+            color: var(--danger-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat me-2"></i>
+                Healthcare Social Media Intelligence
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text text-muted">
+                    <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>
+                    Real-time Analysis
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid mt-4">
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 class="text-center mb-4">Search Healthcare Intelligence</h2>
+            <div class="search-container">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Enter drug name (e.g., Humira, Keytruda) or company ticker (e.g., ABBV, MRK)"
+                       autocomplete="off">
+                <div class="search-suggestions" id="searchSuggestions"></div>
+            </div>
+        </div>
+
+        <!-- Feature Tabs -->
+        <div class="feature-tabs">
+            <button class="feature-tab active" onclick="switchTab('sentiment')" data-tab="sentiment">
+                <i class="fas fa-comments"></i>
+                Social Sentiment
+            </button>
+            <button class="feature-tab" onclick="switchTab('stock')" data-tab="stock">
+                <i class="fas fa-chart-line"></i>
+                Stock Intelligence
+            </button>
+            <button class="feature-tab" onclick="switchTab('credibility')" data-tab="credibility">
+                <i class="fas fa-user-check"></i>
+                Executive Credibility
+            </button>
+            <button class="feature-tab" onclick="switchTab('fda')" data-tab="fda">
+                <i class="fas fa-pills"></i>
+                FDA Analysis
+            </button>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Loading State -->
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-spinner"></div>
+            <h4>Analyzing Data...</h4>
+            <p class="text-muted">This may take a few moments</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <!-- Sentiment Analysis Tab -->
+            <div class="tab-content active" id="sentimentTab">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <i class="fas fa-hashtag metric-icon"></i>
+                            <div class="metric-value" id="totalMentions">0</div>
+                            <div class="metric-label">Total Mentions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #00c853 0%, #00e676 100%);">
+                            <i class="fas fa-smile metric-icon"></i>
+                            <div class="metric-value" id="avgSentiment">0.00</div>
+                            <div class="metric-label">Avg Sentiment</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #ff6d00 0%, #ff9100 100%);">
+                            <i class="fas fa-chart-pie metric-icon"></i>
+                            <div class="metric-value" id="platformCount">0</div>
+                            <div class="metric-label">Platforms</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #d50000 0%, #ff1744 100%);">
+                            <i class="fas fa-exclamation-triangle metric-icon"></i>
+                            <div class="metric-value" id="sideEffectCount">0</div>
+                            <div class="metric-label">Side Effects</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investment Signal -->
+                <div class="card mb-4" id="investmentSignalCard" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-signal me-2"></i>Investment Signal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center">
+                                <h6>Overall Signal</h6>
+                                <div id="signalBadge" class="sentiment-badge mt-2"></div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Confidence</h6>
+                                <div id="signalConfidence" class="mt-2"></div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h6>Based On</h6>
+                                <div id="signalDataPoints" class="mt-2"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3" id="signalFactors"></div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Sentiment Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="sentimentChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Platform Breakdown</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="platformChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-thumbs-up me-2 text-success"></i>Positive Feedback</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="insight-list" id="positiveList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-thumbs-down me-2 text-danger"></i>Main Concerns</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="insight-list" id="concernsList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Posts -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-comment-alt me-2"></i>Sample Social Media Posts</h5>
+                    </div>
+                    <div class="card-body" id="samplePosts">
+                        <p class="text-muted">No posts to display</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Intelligence Tab -->
+            <div class="tab-content" id="stockTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Stock Intelligence</h4>
+                    </div>
+                    <div class="card-body" id="stockContent">
+                        <p class="text-muted">Select a company to view stock intelligence</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Executive Credibility Tab -->
+            <div class="tab-content" id="credibilityTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-user-check me-2"></i>Executive Credibility Analysis</h4>
+                    </div>
+                    <div class="card-body" id="credibilityContent">
+                        <p class="text-muted">Select a company to view executive credibility</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FDA Analysis Tab -->
+            <div class="tab-content" id="fdaTab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-pills me-2"></i>FDA Submission Analysis</h4>
+                    </div>
+                    <div class="card-body" id="fdaContent">
+                        <p class="text-muted">Select a company to view FDA analysis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentTab = 'sentiment';
+        let currentData = {};
+        let searchTimeout;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && searchInput.value.trim()) {
+                    searchSuggestions.style.display = 'none';
+                    performSearch(searchInput.value.trim());
+                }
+            });
+
+            // Click outside to close suggestions
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    document.getElementById('searchSuggestions').style.display = 'none';
+                }
+            });
+        });
+
+        // Handle search input
+        function handleSearch(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            if (query.length < 2) {
+                suggestions.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                searchDrugs(query);
+            }, 300);
+        }
+
+        // Search for drugs
+        async function searchDrugs(query) {
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            try {
+                const response = await fetch(`/api/search_drugs?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.drugs && data.drugs.length > 0) {
+                    suggestions.innerHTML = data.drugs.map(drug => {
+                        // Style based on type
+                        let typeIndicator = '';
+                        let titleExtra = '';
+                        
+                        if (drug.type === 'unknown') {
+                            typeIndicator = '<span class="badge bg-warning ms-2">New</span>';
+                            titleExtra = ' - Click to search anyway';
+                        } else if (drug.type === 'suggestion') {
+                            typeIndicator = '<span class="badge bg-info ms-2">Popular</span>';
+                        } else if (drug.type === 'company') {
+                            typeIndicator = '<span class="badge bg-success ms-2">Company</span>';
+                        }
+                        
+                        const genericText = drug.generic_name && drug.generic_name !== 'Unknown drug - search anyway' ? 
+                            ` (${drug.generic_name})` : '';
+                        
+                        return `
+                            <div class="search-item" onclick="selectItem('${drug.drug_name.replace(/'/g, "\\'")}', '${drug.ticker}', '${drug.type}')">
+                                <div>
+                                    <div class="search-item-name">
+                                        ${drug.drug_name}${genericText}${typeIndicator}
+                                    </div>
+                                    <div class="search-item-details">${drug.company} • ${drug.ticker}${titleExtra}</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-muted"></i>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    suggestions.innerHTML = `
+                        <div class="search-item" onclick="selectItem('${query}', 'N/A', 'unknown')">
+                            <div>
+                                <div class="search-item-name">${query} <span class="badge bg-warning ms-2">New</span></div>
+                                <div class="search-item-details">Unknown drug - Click to search anyway</div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+                    `;
+                }
+                
+                suggestions.style.display = 'block';
+            } catch (error) {
+                console.error('Search error:', error);
+                suggestions.innerHTML = `
+                    <div class="search-item">
+                        <div class="text-danger">Error searching. Please try again.</div>
+                    </div>
+                `;
+                suggestions.style.display = 'block';
+            }
+        }
+
+        // Select item from suggestions
+        function selectItem(name, ticker, type) {
+            document.getElementById('searchInput').value = name;
+            document.getElementById('searchSuggestions').style.display = 'none';
+            
+            // Store current selection
+            currentData = { name, ticker, type };
+            
+            // Perform search based on current tab
+            performSearch(name, ticker);
+        }
+
+        // Perform search based on current tab
+        function performSearch(query, ticker) {
+            if (currentTab === 'sentiment') {
+                analyzeSentiment(query);
+            } else {
+                // For other tabs, we need a ticker
+                if (ticker || query.match(/^[A-Z]{1,5}$/)) {
+                    analyzeByTicker(ticker || query);
+                } else {
+                    showError('Please select a company from the suggestions or enter a valid ticker symbol.');
+                }
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.feature-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tab + 'Tab');
+            });
+            
+            // If we have data, refresh the view
+            if (currentData.name || currentData.ticker) {
+                performSearch(currentData.name, currentData.ticker);
+            }
+        }
+
+        // Analyze sentiment
+        async function analyzeSentiment(drugName) {
+            showLoading();
+            hideError();
+            
+            try {
+                const response = await fetch(`/api/drug_sentiment/${encodeURIComponent(drugName)}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    showError(data.error);
+                    hideLoading();
+                    return;
+                }
+                
+                displaySentimentResults(data);
+                hideLoading();
+                showResults();
+            } catch (error) {
+                console.error('Sentiment analysis error:', error);
+                showError('Failed to analyze sentiment. Please try again.');
+                hideLoading();
+            }
+        }
+
+        // Analyze by ticker (for other tabs)
+        async function analyzeByTicker(ticker) {
+            showLoading();
+            hideError();
+            
+            try {
+                if (currentTab === 'stock') {
+                    await analyzeStock(ticker);
+                } else if (currentTab === 'credibility') {
+                    await analyzeCredibility(ticker);
+                } else if (currentTab === 'fda') {
+                    await analyzeFDA(ticker);
+                }
+                
+                hideLoading();
+                showResults();
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showError('Failed to analyze. Please try again.');
+                hideLoading();
+            }
+        }
+
+        // Analyze stock
+        async function analyzeStock(ticker) {
+            const response = await fetch(`/api/stock_price/${encodeURIComponent(ticker)}`);
+            const data = await response.json();
+            
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+            
+            displayStockResults(data);
+        }
+
+        // Analyze executive credibility
+        async function analyzeCredibility(ticker) {
+            const response = await fetch(`/api/executive_credibility/${encodeURIComponent(ticker)}`);
+            const data = await response.json();
+            
+            displayCredibilityResults(data);
+        }
+
+        // Analyze FDA
+        async function analyzeFDA(ticker) {
+            const response = await fetch(`/api/fda_predictions/${encodeURIComponent(ticker)}`);
+            const data = await response.json();
+            
+            displayFDAResults(data);
+        }
+
+        // Display sentiment results
+        function displaySentimentResults(data) {
+            // Update metrics
+            document.getElementById('totalMentions').textContent = data.total_mentions || 0;
+            document.getElementById('avgSentiment').textContent = (data.average_sentiment || 0).toFixed(2);
+            document.getElementById('platformCount').textContent = data.platforms_analyzed ? 
+                Object.keys(data.platforms_analyzed).length : 0;
+            document.getElementById('sideEffectCount').textContent = data.top_side_effects ? 
+                Object.keys(data.top_side_effects).length : 0;
+
+            // Investment signal
+            if (data.investment_signal) {
+                const signalCard = document.getElementById('investmentSignalCard');
+                const signalBadge = document.getElementById('signalBadge');
+                const signalConfidence = document.getElementById('signalConfidence');
+                const signalDataPoints = document.getElementById('signalDataPoints');
+                const signalFactors = document.getElementById('signalFactors');
+                
+                signalCard.style.display = 'block';
+                
+                // Signal type
+                const signal = data.investment_signal.signal || 'NEUTRAL';
+                signalBadge.className = `sentiment-badge sentiment-${signal.toLowerCase()}`;
+                signalBadge.innerHTML = `<i class="fas fa-${signal === 'POSITIVE' ? 'arrow-up' : signal === 'NEGATIVE' ? 'arrow-down' : 'minus'}"></i> ${signal}`;
+                
+                // Confidence
+                const confidence = data.investment_signal.confidence || 'Low';
+                signalConfidence.innerHTML = `<strong>${confidence}</strong>`;
+                
+                // Data points
+                signalDataPoints.innerHTML = `<strong>${data.total_mentions || 0}</strong> mentions analyzed`;
+                
+                // Factors
+                if (data.investment_signal.factors && data.investment_signal.factors.length > 0) {
+                    signalFactors.innerHTML = '<h6 class="mt-3">Key Factors:</h6><ul class="mb-0">' + 
+                        data.investment_signal.factors.map(factor => `<li>${factor}</li>`).join('') + 
+                        '</ul>';
+                }
+            }
+
+            // Charts
+            if (data.sentiment_distribution) {
+                createSentimentChart(data.sentiment_distribution);
+            }
+            
+            if (data.platforms_analyzed) {
+                createPlatformChart(data.platforms_analyzed);
+            }
+
+            // Insights
+            const positiveList = document.getElementById('positiveList');
+            const concernsList = document.getElementById('concernsList');
+            
+            positiveList.innerHTML = (data.top_positives || []).slice(0, 5).map(item => 
+                `<li><i class="fas fa-check-circle insight-icon text-success"></i><div>${item}</div></li>`
+            ).join('') || '<li class="text-muted">No positive feedback found</li>';
+            
+            concernsList.innerHTML = (data.top_concerns || []).slice(0, 5).map(item => 
+                `<li><i class="fas fa-exclamation-circle insight-icon text-danger"></i><div>${item}</div></li>`
+            ).join('') || '<li class="text-muted">No concerns found</li>';
+
+            // Sample posts
+            if (data.sample_mentions && data.sample_mentions.length > 0) {
+                const samplePosts = document.getElementById('samplePosts');
+                samplePosts.innerHTML = data.sample_mentions.slice(0, 3).map(post => `
+                    <div class="sample-post">
+                        <div class="post-header">
+                            <div class="post-platform">
+                                <i class="fab fa-${post.platform.toLowerCase() === 'reddit' ? 'reddit' : 'twitter'}"></i>
+                                ${post.platform}
+                            </div>
+                            <div class="post-date">${new Date(post.date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="post-content">${post.content}</div>
+                        <div class="mt-2">
+                            <span class="sentiment-badge sentiment-${post.sentiment.toLowerCase()}">
+                                ${post.sentiment}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Create sentiment chart
+        function createSentimentChart(distribution) {
+            const data = [{
+                type: 'pie',
+                labels: Object.keys(distribution),
+                values: Object.values(distribution),
+                marker: {
+                    colors: ['#00c853', '#2962ff', '#ff6d00', '#d50000']
+                },
+                textinfo: 'label+percent',
+                textposition: 'outside',
+                hoverinfo: 'label+value'
+            }];
+            
+            const layout = {
+                showlegend: false,
+                margin: { t: 20, b: 20, l: 20, r: 20 },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#8892b0' }
+            };
+            
+            Plotly.newPlot('sentimentChart', data, layout, { responsive: true });
+        }
+
+        // Create platform chart
+        function createPlatformChart(platforms) {
+            const data = [{
+                type: 'bar',
+                x: Object.keys(platforms),
+                y: Object.values(platforms),
+                marker: {
+                    color: '#2962ff'
+                }
+            }];
+            
+            const layout = {
+                xaxis: { 
+                    title: 'Platform',
+                    color: '#8892b0'
+                },
+                yaxis: { 
+                    title: 'Mentions',
+                    color: '#8892b0'
+                },
+                margin: { t: 20, b: 60, l: 60, r: 20 },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#8892b0' }
+            };
+            
+            Plotly.newPlot('platformChart', data, layout, { responsive: true });
+        }
+
+        // Display stock results
+        function displayStockResults(data) {
+            const content = document.getElementById('stockContent');
+            
+            content.innerHTML = `
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <h5>${data.company_name}</h5>
+                        <h2 class="text-primary">$${data.current_price}</h2>
+                        <p class="text-muted">Market Cap: ${data.market_cap}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>52 Week Range</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>Low: $${data['52_week_low']}</span>
+                            <span>High: $${data['52_week_high']}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Financial Health</h6>
+                        <small>Cash: ${data.financial_health.cash_position}</small><br>
+                        <small>Burn Rate: ${data.financial_health.burn_rate}</small><br>
+                        <small>Runway: ${data.financial_health.runway}</small>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5>Pipeline</h5>
+                ${data.pipeline && data.pipeline.length > 0 ? 
+                    '<ul>' + data.pipeline.map(drug => 
+                        `<li><strong>${drug.drug_name}</strong> - ${drug.indication} (${drug.phase})</li>`
+                    ).join('') + '</ul>' : 
+                    '<p class="text-muted">No pipeline data available</p>'
+                }
+                
+                <h5 class="mt-4">Recent Developments</h5>
+                ${data.recent_developments && data.recent_developments.length > 0 ?
+                    data.recent_developments.map(news => 
+                        `<div class="mb-3">
+                            <small class="text-muted">${news.date}</small>
+                            <div><strong>${news.title}</strong></div>
+                        </div>`
+                    ).join('') :
+                    '<p class="text-muted">No recent news</p>'
+                }
+            `;
+        }
+
+        // Display credibility results
+        function displayCredibilityResults(data) {
+            const content = document.getElementById('credibilityContent');
+            
+            if (data.error) {
+                content.innerHTML = `<p class="text-muted">${data.error}</p>`;
+                return;
+            }
+            
+            const score = data.overall_credibility || 0;
+            const scoreClass = score >= 80 ? 'text-success' : score >= 60 ? 'text-warning' : 'text-danger';
+            
+            content.innerHTML = `
+                <div class="text-center mb-4">
+                    <h1 class="${scoreClass}">${(score * 100).toFixed(1)}%</h1>
+                    <p>Company Credibility Score</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6>Promise Tracking</h6>
+                        <p>Total Executives: ${data.total_executives || 0}</p>
+                        <p>Total Promises: ${data.total_promises || 0}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Performance by Type</h6>
+                        ${data.by_promise_type ? 
+                            Object.entries(data.by_promise_type).map(([type, stats]) => 
+                                `<p>${type.replace(/_/g, ' ')}: ${(stats.success_rate * 100).toFixed(0)}%</p>`
+                            ).join('') :
+                            '<p class="text-muted">No data available</p>'
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // Display FDA results
+        function displayFDAResults(data) {
+            const content = document.getElementById('fdaContent');
+            
+            if (data.error) {
+                content.innerHTML = `<p class="text-muted">${data.error}</p>`;
+                return;
+            }
+            
+            content.innerHTML = `
+                <h5>${data.company} FDA Submissions</h5>
+                
+                <div class="row g-4 my-3">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3>${data.total_submissions || 0}</h3>
+                            <small>Total Submissions</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-warning">${data.pending_decisions || 0}</h3>
+                            <small>Pending</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-success">${data.approvals || 0}</h3>
+                            <small>Approved</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3>${data.approval_rate || 'N/A'}</h3>
+                            <small>Approval Rate</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <h6 class="mt-4">Recent Submissions</h6>
+                ${data.recent_submissions && data.recent_submissions.length > 0 ?
+                    '<ul>' + data.recent_submissions.map(sub => 
+                        `<li>
+                            <strong>${sub.drug_name}</strong> - ${sub.indication}
+                            <br><small>PDUFA: ${sub.pdufa_date || 'TBD'} | Status: ${sub.decision_type || 'Pending'}</small>
+                        </li>`
+                    ).join('') + '</ul>' :
+                    '<p class="text-muted">No recent submissions</p>'
+                }
+            `;
+        }
+
+        // UI Helper functions
+        function showLoading() {
+            document.getElementById('loadingContainer').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingContainer').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html> 

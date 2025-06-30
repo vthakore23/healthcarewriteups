@@ -88,21 +88,31 @@ class OptimizedHealthcareNewsAutomation:
             logger.info(f"✅ Selected {len(interesting_indices)} articles for deep analysis")
             
             # 4. Generate additional analysis for interesting articles
-            logger.info(f"\n🔍 STEP 4: Generating in-depth analysis...")
+            logger.info(f"\n🔍 STEP 4: Generating comprehensive in-depth analysis with real-time company research...")
             analyses = []
             for i, idx in enumerate(interesting_indices):
                 if idx < len(summaries):
-                    logger.info(f"   Analyzing article {i+1}/{len(interesting_indices)}: {summaries[idx]['title'][:60]}...")
-                    analysis_text = self.ai_generator.generate_analysis(summaries[idx]['summary'])
+                    article_title = summaries[idx]['title']
+                    company_name = summaries[idx].get('company_name', '')
+                    logger.info(f"   📊 Analyzing article {i+1}/{len(interesting_indices)}: {article_title[:60]}...")
+                    logger.info(f"   🔬 Company: {company_name}")
+                    
+                    # Generate news-specific analysis focused on why this news matters for this company
+                    analysis_text = self.ai_generator.generate_analysis(
+                        summary_text=summaries[idx]['summary'],
+                        article_title=article_title,
+                        company_name=company_name
+                    )
                     
                     if analysis_text:
                         analyses.append({
-                            'title': summaries[idx]['title'],
+                            'title': article_title,
                             'url': summaries[idx]['url'],
                             'summary': summaries[idx]['summary'],
-                            'analysis': analysis_text
+                            'analysis': analysis_text,
+                            'company_name': company_name
                         })
-                        logger.info(f"   ✅ Analysis complete")
+                        logger.info(f"   ✅ News-specific analysis complete")
             
             # 5. Save report locally
             logger.info(f"\n💾 STEP 5: Saving reports...")

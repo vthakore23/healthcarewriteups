@@ -87,19 +87,29 @@ class HealthcareNewsAutomation:
             logger.info("Selecting interesting articles...")
             interesting_indices = self.ai_generator.select_interesting_articles(summaries)
             
-            # 4. Generate additional analysis for interesting articles
+            # 4. Generate additional analysis for interesting articles with real-time company research
             analyses = []
             for idx in interesting_indices:
                 if idx < len(summaries):
-                    logger.info(f"Generating analysis for: {summaries[idx]['title']}")
-                    analysis_text = self.ai_generator.generate_analysis(summaries[idx]['summary'])
+                    article_title = summaries[idx]['title']
+                    company_name = summaries[idx].get('company_name', '')
+                    logger.info(f"Generating news-specific analysis for: {article_title}")
+                    logger.info(f"Company: {company_name}")
+                    
+                    # Generate news-specific analysis focused on why this news matters for this company
+                    analysis_text = self.ai_generator.generate_analysis(
+                        summary_text=summaries[idx]['summary'],
+                        article_title=article_title,
+                        company_name=company_name
+                    )
                     
                     if analysis_text:
                         analyses.append({
-                            'title': summaries[idx]['title'],
+                            'title': article_title,
                             'url': summaries[idx]['url'],
                             'summary': summaries[idx]['summary'],
-                            'analysis': analysis_text
+                            'analysis': analysis_text,
+                            'company_name': company_name
                         })
             
             # 5. Save report locally

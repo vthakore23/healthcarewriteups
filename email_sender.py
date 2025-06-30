@@ -99,99 +99,240 @@ class EmailSender:
 <head>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #fafafa;
         }
         h1 {
             color: #2c5282;
             border-bottom: 3px solid #2c5282;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
+            font-size: 2.2em;
+            text-align: center;
         }
         h2 {
             color: #2d3748;
-            margin-top: 30px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-left: 5px solid #3182ce;
+            padding-left: 15px;
         }
         h3 {
-            color: #4a5568;
+            color: #1a365d;
+            font-size: 1.3em;
+            margin-bottom: 10px;
         }
         .summary {
-            background-color: #f7fafc;
-            border-left: 4px solid #3182ce;
-            padding: 15px;
-            margin: 20px 0;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #3182ce;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .analysis {
-            background-color: #fef5e7;
-            border-left: 4px solid #f39c12;
-            padding: 15px;
-            margin: 20px 0;
+            background-color: #fff8e7;
+            border: 1px solid #f6e05e;
+            border-left: 5px solid #f39c12;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .article-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #1a365d;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 6px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         .company-name {
             font-weight: bold;
             color: #2c5282;
+            background-color: #e6fffa;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
         }
         .news-event {
             font-style: italic;
             color: #718096;
+            background-color: #f7fafc;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
         }
         .section-title {
             font-weight: bold;
             color: #2d3748;
-            margin-top: 15px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .standout-points {
+            background-color: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
         }
         .footer {
             margin-top: 50px;
             padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 2px solid #e2e8f0;
             font-size: 0.9em;
             color: #718096;
+            text-align: center;
         }
         .highlight {
             background-color: #fff5f5;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid #f56565;
+        }
+        .article-link {
+            display: inline-block;
+            background-color: #3182ce;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
             margin: 10px 0;
+            font-weight: 500;
+        }
+        .article-link:hover {
+            background-color: #2c5282;
+        }
+        .stats-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .analysis-header {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -25px -25px 20px -25px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .external-research {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-style: italic;
+        }
+        .source-citation {
+            font-size: 0.9em;
+            color: #666;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
         }
     </style>
 </head>
 <body>
-    <h1>Healthcare News Summary - {{ date }}</h1>
+    <h1>🧬 Daily Healthcare Investment Intelligence Report</h1>
     
-    <p>Good morning,</p>
-    <p>Here is today's healthcare and biotech news summary from lifesciencereport.com:</p>
+    <div class="stats-bar">
+        <strong>📊 Daily Summary:</strong> {{ summaries|length }} healthcare/biotech articles analyzed | {{ analyses|length }} detailed investment insights | Real-time research included
+    </div>
     
-    <h2>📊 Daily Summaries</h2>
+    <p style="font-size: 1.1em; text-align: center; color: #4a5568; margin-bottom: 30px;">
+        <strong>Daily healthcare and biotech news analysis from lifesciencereport.com/newsroom</strong><br>
+        Structured using investment-grade format | Target: ~600 words per summary
+    </p>
+    
+    <h2>📈 Daily Article Summaries</h2>
+    <p style="background-color: #e6fffa; padding: 15px; border-radius: 8px; border-left: 4px solid #38b2ac;">
+        <strong>🎯 Format:</strong> Each summary follows the exact investment analysis structure with "Standout Points" as the meatiest section containing all quantifiable data, mechanisms, and competitive differentiation.
+    </p>
     
     {% for summary in summaries %}
     <div class="summary">
-        <h3>{{ loop.index }}. {{ summary.title }}</h3>
-        <p><a href="{{ summary.url }}">View Original Article</a></p>
+        <div class="article-title">
+            📋 Article {{ loop.index }}: {{ summary.title }}
+        </div>
         
-        {{ summary.summary | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+        {% if summary.company_name %}
+        <div class="company-name">🏢 Company: {{ summary.company_name }}</div>
+        {% endif %}
+        
+        <a href="{{ summary.url }}" class="article-link" target="_blank">🔗 View Original Article</a>
+        
+        <div style="margin-top: 15px;">
+            {% set summary_parts = summary.summary.split('Standout Points:') %}
+            {% if summary_parts|length > 1 %}
+                {{ summary_parts[0] | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+                <div class="standout-points">
+                    <div class="section-title">⭐ Standout Points (Meatiest Section):</div>
+                    {% set remaining = summary_parts[1].split('Additional Developments:') %}
+                    {{ remaining[0] | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+                </div>
+                {% if remaining|length > 1 %}
+                    <div class="section-title">📈 Additional Developments:</div>
+                    {{ remaining[1] | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+                {% endif %}
+            {% else %}
+                {{ summary.summary | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+            {% endif %}
+        </div>
     </div>
     {% endfor %}
     
     {% if analyses %}
-    <h2>🔍 In-Depth Analysis</h2>
-    <p>The following {{ analyses|length }} article(s) were selected as particularly interesting:</p>
+    <h2>🔍 Additional Analysis: Why These Events Are Interesting</h2>
+    <p style="background-color: #fff8e7; padding: 15px; border-radius: 8px; border-left: 4px solid #f39c12;">
+        <strong>🎯 Investment Focus:</strong> The following {{ analyses|length }} article(s) were selected for additional analysis focusing on <em>why they're interesting</em> and their <em>longer-term implications</em>. External research sources are cited when used.
+    </p>
     
     {% for analysis in analyses %}
     <div class="analysis">
-        <h3>{{ analysis.title }}</h3>
+        <div class="analysis-header">
+            💡 WHY INTERESTING & IMPLICATIONS: {{ analysis.title }}
+            {% if analysis.company_name %}
+            <br><span style="font-size: 0.9em; opacity: 0.9;">🏢 {{ analysis.company_name }}</span>
+            {% endif %}
+        </div>
         
-        <div class="section-title">Additional Analysis:</div>
-        {{ analysis.analysis | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+        <div style="background-color: white; padding: 15px; border-radius: 6px; margin: 10px 0;">
+            {% set analysis_text = analysis.analysis %}
+            {% if 'According to' in analysis_text or 'Industry data' in analysis_text or 'Market research' in analysis_text %}
+                <div class="external-research">
+                    🔍 <strong>Note:</strong> This analysis includes external research sources beyond the original press release, properly cited within the text.
+                </div>
+            {% endif %}
+            {{ analysis_text | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}
+        </div>
     </div>
     {% endfor %}
     {% endif %}
     
     <div class="footer">
-        <p>This report was automatically generated by the Healthcare News Automation system.</p>
-        <p>For questions or feedback, please reply to this email.</p>
+        <p><strong>🤖 Automated Healthcare Investment Intelligence Platform</strong></p>
+        <p>Generated: {{ date }} | Structured per investment analysis format | Sources cited for external research</p>
+        <p><em>Each summary targets ~600 words with "Standout Points" as the meatiest section containing all quantifiable data</em></p>
     </div>
 </body>
 </html>

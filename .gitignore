@@ -1,14 +1,8 @@
-# Environment variables
+# Environment and Configuration
 .env
-.env.local
-.env.production
-
-# Virtual environment
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+*.env
+api_keys.txt
+config_local.py
 
 # Python
 __pycache__/
@@ -33,14 +27,83 @@ wheels/
 *.egg
 MANIFEST
 
-# Data and reports
-data/
-reports/
-cache/
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Database files (keep structure, ignore data)
+*.db-journal
+*.db-wal
+*.db-shm
 
 # Logs
 *.log
 logs/
+*.out
+
+# Cache and temporary files
+cache/
+temp/
+tmp/
+.cache/
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Reports (optional - comment out if you want to track reports)
+reports/*.html
+reports/*.pdf
+reports/*.json
+
+# Test outputs
+test_output/
+test_results/
+
+# Flask session files
+flask_session/
+
+# PyCharm
+.idea/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Scraped data (large files)
+scraped_data/
+raw_data/
+
+# Backup files
+*.bak
+*.backup
+*~
 
 # Chrome driver
 chromedriver
@@ -61,9 +124,6 @@ htmlcov/
 .tox/
 .cache
 .mypy_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
 
 # macOS
 .DS_Store

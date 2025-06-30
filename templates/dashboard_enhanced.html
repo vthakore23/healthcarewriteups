@@ -1,148 +1,9 @@
-"""
-Healthcare News Automation - Web Interface
-Simple, beautiful interface for running news analysis and downloading reports
-"""
-
-from flask import Flask, render_template, request, jsonify, send_file, flash, redirect, url_for
-import os
-import json
-import threading
-import time
-from datetime import datetime, timedelta
-import glob
-import logging
-
-app = Flask(__name__)
-app.secret_key = 'healthcare-news-automation-secret-key'
-
-# Global variable to track analysis status
-analysis_status = {
-    'running': False,
-    'progress': 0,
-    'message': '',
-    'results': None,
-    'error': None
-}
-
-def run_analysis_async():
-    """Run analysis in background thread"""
-    global analysis_status
-    try:
-        analysis_status['running'] = True
-        analysis_status['progress'] = 10
-        analysis_status['message'] = 'Starting analysis...'
-        
-        # Import and run the analysis
-        from main_optimized import OptimizedHealthcareNewsAutomation
-        
-        analysis_status['progress'] = 20
-        analysis_status['message'] = 'Initializing automation system...'
-        
-        automation = OptimizedHealthcareNewsAutomation()
-        
-        analysis_status['progress'] = 30
-        analysis_status['message'] = 'Running healthcare news analysis...'
-        
-        # Run the analysis
-        automation.run_daily_task(send_email=False)  # Disable email for web interface
-        
-        analysis_status['progress'] = 100
-        analysis_status['message'] = 'Analysis complete!'
-        analysis_status['results'] = True
-        analysis_status['running'] = False
-        
-    except Exception as e:
-        import traceback
-        error_details = traceback.format_exc()
-        logging.error(f"Analysis error: {error_details}")
-        analysis_status['error'] = str(e)
-        analysis_status['running'] = False
-        analysis_status['message'] = f'Error: {str(e)}'
-
-@app.route('/')
-def index():
-    """Main dashboard"""
-    # Get recent reports
-    reports_dir = 'reports'
-    recent_reports = []
-    
-    if os.path.exists(reports_dir):
-        html_files = glob.glob(os.path.join(reports_dir, '*report_*.html'))
-        json_files = glob.glob(os.path.join(reports_dir, '*report_*.json'))
-        
-        for html_file in sorted(html_files, reverse=True)[:10]:
-            basename = os.path.basename(html_file)
-            date_str = basename.replace('report_', '').replace('.html', '')
-            json_file = html_file.replace('.html', '.json')
-            
-            report_info = {
-                'date': date_str,
-                'html_file': html_file,
-                'json_file': json_file if os.path.exists(json_file) else None,
-                'size': os.path.getsize(html_file),
-                'created': datetime.fromtimestamp(os.path.getctime(html_file))
-            }
-            recent_reports.append(report_info)
-    
-    return render_template('dashboard.html', 
-                         reports=recent_reports,
-                         status=analysis_status)
-
-@app.route('/run-analysis', methods=['POST'])
-def run_analysis_endpoint():
-    """Start analysis in background"""
-    global analysis_status
-    
-    if analysis_status['running']:
-        return jsonify({'error': 'Analysis already running'}), 400
-    
-    # Reset status
-    analysis_status = {
-        'running': True,
-        'progress': 0,
-        'message': 'Initializing...',
-        'results': None,
-        'error': None
-    }
-    
-    # Start analysis in background thread
-    thread = threading.Thread(target=run_analysis_async)
-    thread.daemon = True
-    thread.start()
-    
-    return jsonify({'message': 'Analysis started'})
-
-@app.route('/status')
-def get_status():
-    """Get current analysis status"""
-    return jsonify(analysis_status)
-
-@app.route('/download/<path:filename>')
-def download_file(filename):
-    """Download report file"""
-    try:
-        return send_file(filename, as_attachment=True)
-    except Exception as e:
-        flash(f'Error downloading file: {str(e)}', 'error')
-        return redirect(url_for('index'))
-
-@app.route('/view-report/<path:filename>')
-def view_report(filename):
-    """View HTML report in browser"""
-    try:
-        return send_file(filename)
-    except Exception as e:
-        flash(f'Error viewing report: {str(e)}', 'error')
-        return redirect(url_for('index'))
-
-def create_dashboard_template():
-    """Create the dashboard HTML template"""
-    template_content = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Healthcare Writeups - Investment Intelligence Dashboard</title>
+    <title>Healthcare Investment Intelligence Platform - Enhanced Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css" rel="stylesheet">
     <style>
@@ -348,6 +209,112 @@ def create_dashboard_template():
             50% { opacity: 0.7; }
         }
         
+        /* Stock Ticker Search */
+        .stock-search-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .stock-search-section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            font-size: 16px;
+            color: var(--text-primary);
+            backdrop-filter: blur(10px);
+            transition: var(--transition-smooth);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .stock-results {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .stock-results.show {
+            display: block;
+        }
+        
+        .stock-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stock-metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .credibility-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .credibility-score.high {
+            color: #10b981;
+            border-color: #10b981;
+        }
+        
+        .credibility-score.medium {
+            color: #f59e0b;
+            border-color: #f59e0b;
+        }
+        
+        .credibility-score.low {
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+        
         /* Action Bar */
         .action-bar {
             position: sticky;
@@ -443,11 +410,6 @@ def create_dashboard_template():
         
         .btn:hover .emoji {
             transform: scale(1.2) rotate(5deg);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
         
         /* Status Card with Glassmorphism */
@@ -707,6 +669,10 @@ def create_dashboard_template():
             .nav-controls {
                 gap: 12px;
             }
+            
+            .search-form {
+                flex-direction: column;
+            }
         }
         
         /* Scroll Behavior */
@@ -736,7 +702,7 @@ def create_dashboard_template():
 <body>
     <!-- Top Navigation -->
     <nav class="top-nav">
-        <div class="logo">🧬 Healthcare Writeups</div>
+        <div class="logo">🧬 Healthcare Intelligence Platform</div>
         <div class="nav-controls">
             <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
                 🌙
@@ -750,8 +716,23 @@ def create_dashboard_template():
 
     <div class="container">
         <div class="header">
-            <h1><span class="medical-icon">🧬</span>Healthcare Writeups<span class="medical-icon">📊</span></h1>
-            <p>AI-Powered Daily Healthcare News Analysis & Investment Intelligence Platform</p>
+            <h1><span class="medical-icon">🧬</span>Healthcare Investment Intelligence<span class="medical-icon">📊</span></h1>
+            <p>AI-Powered Healthcare Analysis with Management Truth Tracker™ & FDA Decision Analyzer</p>
+        </div>
+        
+        <!-- Stock Ticker Search Section -->
+        <div class="stock-search-section">
+            <h3><span class="medical-icon">📈</span>Stock Ticker Intelligence</h3>
+            <div class="search-form">
+                <input type="text" id="tickerInput" class="search-input" placeholder="Enter healthcare stock ticker (e.g., MRNA, PFE, JNJ)" />
+                <button onclick="lookupStock()" class="btn btn-primary">
+                    <span class="emoji">🔍</span>
+                    Analyze
+                </button>
+            </div>
+            <div id="stockResults" class="stock-results">
+                <!-- Results will be populated here -->
+            </div>
         </div>
         
         <!-- Sticky Action Bar -->
@@ -764,6 +745,10 @@ def create_dashboard_template():
                 <span class="emoji">📈</span>
                 Refresh Dashboard
             </button>
+            <a href="/executive-check" class="btn btn-secondary">
+                <span class="emoji">🕵️</span>
+                Executive Credibility
+            </a>
         </div>
         
         <div id="statusCard" class="status-card" style="display: none;">
@@ -857,6 +842,93 @@ def create_dashboard_template():
         
         function showProfile() {
             alert('Profile menu coming soon! 👨‍💼');
+        }
+        
+        function lookupStock() {
+            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+            const resultsDiv = document.getElementById('stockResults');
+            
+            if (!ticker) {
+                alert('Please enter a stock ticker');
+                return;
+            }
+            
+            // Show loading state
+            resultsDiv.innerHTML = '<div class="loading"></div> Loading stock data... (Using demo mode to avoid rate limits)';
+            resultsDiv.classList.add('show');
+            
+            fetch(`/stock-lookup/${ticker}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultsDiv.innerHTML = `<div class="alert alert-error" style="white-space: pre-line; line-height: 1.6;">${data.error}</div>`;
+                        return;
+                    }
+                    
+                    // Calculate credibility class
+                    let credClass = 'low';
+                    if (data.management_credibility.company_credibility_score >= 70) {
+                        credClass = 'high';
+                    } else if (data.management_credibility.company_credibility_score >= 40) {
+                        credClass = 'medium';
+                    }
+                    
+                    resultsDiv.innerHTML = `
+                        <h4>${data.company_name} (${data.ticker})</h4>
+                        <p style="font-size: 0.9em; color: #14b8a6; margin: 10px 0;">📊 Demo Mode: Using cached data to avoid rate limits</p>
+                        <div class="stock-metric">
+                            <span class="metric-label">Current Price</span>
+                            <span class="metric-value">$${data.current_price.toFixed(2)}</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Market Cap</span>
+                            <span class="metric-value">${data.market_cap}</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Cash Position</span>
+                            <span class="metric-value">${data.financial_health.cash_position}</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Burn Rate</span>
+                            <span class="metric-value">${data.financial_health.cash_burn_rate}</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Cash Runway</span>
+                            <span class="metric-value">${data.financial_health.runway_months}</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Management Credibility</span>
+                            <span class="metric-value">
+                                <span class="credibility-score ${credClass}">
+                                    ${data.management_credibility.company_credibility_score}%
+                                </span>
+                            </span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">FDA Submissions</span>
+                            <span class="metric-value">${data.fda_submissions.total_submissions} (${data.fda_submissions.pending_decisions} pending)</span>
+                        </div>
+                        <div class="stock-metric">
+                            <span class="metric-label">Approval Rate</span>
+                            <span class="metric-value">${data.fda_submissions.approval_rate}</span>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <a href="/stock-report/${ticker}" class="btn btn-primary btn-small" target="_blank">
+                                <span class="emoji">📄</span> Full Report
+                            </a>
+                            <button onclick="checkExecutives('${data.company_name}')" class="btn btn-secondary btn-small">
+                                <span class="emoji">🕵️</span> Check Executives
+                            </button>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+                });
+        }
+        
+        function checkExecutives(company) {
+            window.open(`/executive-credibility/${encodeURIComponent(company)}`, '_blank');
         }
         
         function runAnalysis() {
@@ -976,7 +1048,7 @@ def create_dashboard_template():
         // Add smooth scrolling and animations
         document.addEventListener('DOMContentLoaded', function() {
             // Animate elements on page load
-            const cards = document.querySelectorAll('.report-card, .alert');
+            const cards = document.querySelectorAll('.report-card, .alert, .stock-search-section');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(30px)';
@@ -987,24 +1059,14 @@ def create_dashboard_template():
                     card.style.transform = 'translateY(0)';
                 }, index * 100);
             });
+            
+            // Handle Enter key in search input
+            document.getElementById('tickerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    lookupStock();
+                }
+            });
         });
     </script>
 </body>
-</html>'''
-    
-    # Write the template
-    with open('templates/dashboard.html', 'w') as f:
-        f.write(template_content)
-
-if __name__ == '__main__':
-    # Create templates directory if it doesn't exist
-    os.makedirs('templates', exist_ok=True)
-    
-    # Create the HTML template
-    create_dashboard_template()
-    
-    print("🚀 Healthcare News Automation Interface")
-    print("📊 Starting web interface at http://localhost:5001")
-    print("💡 Use this interface to run analysis and download reports")
-    
-    app.run(debug=True, host='0.0.0.0', port=5001) 
+</html> 

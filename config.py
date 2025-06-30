@@ -4,24 +4,27 @@ Configuration settings for Healthcare News Automation
 import os
 from datetime import time
 from pytz import timezone
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Email Configuration - DISABLED
-# Reports are generated for manual download and sending
-EMAIL_RECIPIENTS = []  # Email functionality completely disabled
+EMAIL_RECIPIENTS = []  # Email functionality disabled
 EMAIL_FROM = ''
 SENDGRID_API_KEY = ''
-EMAIL_ENABLED = False  # Master email toggle - DISABLED
+EMAIL_ENABLED = False  # Reports saved locally only
 
-# Email settings removed - focus on report generation instead
-SMTP_SERVER = ''
-SMTP_PORT = 0
-SMTP_USERNAME = ''
-SMTP_PASSWORD = ''
+# SMTP settings as fallback if SendGrid not available
+SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
+SMTP_USERNAME = os.getenv('SMTP_USERNAME', '')
+SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
 
 # AI Configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-AI_MODEL = os.getenv('AI_MODEL', 'gpt-4-turbo-preview')  # or 'claude-3-opus-20240229'
+AI_MODEL = os.getenv('AI_MODEL', 'gpt-4')  # or 'claude-3-opus-20240229'
 
 # Web Scraping Configuration
 BASE_URL = 'https://lifesciencereport.com/newsroom'
@@ -36,124 +39,157 @@ CHECK_TIMES = [
 ]
 
 # Summary Configuration
-TARGET_WORD_COUNT = 600
-MIN_WORD_COUNT = 400
-MAX_WORD_COUNT = 700
+TARGET_WORD_COUNT = 600  # Target approximately 600 words per summary
+MIN_WORD_COUNT = 550     # Minimum acceptable word count
+MAX_WORD_COUNT = 650     # Maximum word count
 
 # File Storage
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 REPORTS_DIR = os.path.join(os.path.dirname(__file__), 'reports')
 CACHE_DIR = os.path.join(os.path.dirname(__file__), 'cache')
 
-# Enhanced Investment-Grade Summary Prompt Template
+# Healthcare News Summary Prompt Structure - EXACT EMAIL FORMAT
 SUMMARY_PROMPT = """
-BIOTECH INVESTMENT ANALYSIS PROMPT
+You are analyzing healthcare/biotech news for investment professionals. Create a structured 600-word analysis following the EXACT format specified.
 
-Generate comprehensive, investment-grade summaries for biotech/healthcare news optimized for portfolio managers and biotech investors.
+CRITICAL INSTRUCTIONS - FOLLOW EXACTLY:
+- Use the precise structure below with exact section headers
+- Target 600 words total (550-650 acceptable range)
+- Make "Standout Points" the MEATIEST section (40-50% of total words)
+- Include ALL quantifiable data in Standout Points
+- Write exactly 5 sentences in News Summary
+- Be specific about mechanisms, drugs, targets, and differentiation
 
-CRITICAL DATA COLLECTION REQUIREMENTS:
-- Extract ALL numerical data: efficacy percentages, patient numbers (n=X), statistical significance (p-values), effect sizes
-- Include financial figures: revenue, market size, development costs, analyst estimates, milestone payments
-- Specify timeline data: study duration, enrollment periods, regulatory timelines, next catalysts
-- Detail dosing, administration routes, treatment regimens, and competitive benchmarking
-- Always include primary/secondary endpoint results with confidence intervals when available
-
-Here is the biotech news to analyze:
+Here is the biotech/healthcare news to analyze:
 
 {article_text}
 
-REQUIRED STRUCTURE (500-600 words):
+REQUIRED STRUCTURE (EXACT FORMAT):
 
-Company Name: [Insert Company Name with ticker if available]
+Company Name: [Company name with ticker if available - keep this line brief]
 
-News Event: [Specify: Clinical Data Release, FDA Action, Earnings, Partnership Deal, Regulatory Milestone, etc.]
+News Event: [Single clear category: Data Release, Partnership, FDA Action, M&A, Financial, Pipeline Update, etc.]
 
 News Summary:
-[5-sentence paragraph covering: (1) What happened factually, (2) Key numerical results with sample sizes, (3) Statistical significance and clinical relevance, (4) Market/competitive context, (5) Immediate investor implications. Include mechanism of action explanation and disease context for non-technical readers.]
+[Write EXACTLY 5 sentences covering: (1) key development announcement, (2) specific figures/data from the news, (3) business implications, (4) timeline or next steps, (5) overall significance. Each sentence must be substantial and informative with specific details.]
 
-Standout Points: **[MOST CRITICAL SECTION - MAKE THIS DATA-RICH]**
-- Primary Endpoint Results: [Include exact percentages, p-values, confidence intervals, sample size]
-- Safety Profile: [Adverse event rates, discontinuation rates, dose-limiting toxicities]
-- Market Differentiation: [How this compares to standard of care and competitors with specific data]
-- Commercial Potential: [Addressable patient population size, pricing potential, peak sales estimates]
-- Regulatory Pathway: [FDA designations, approval timeline, breakthrough status, orphan designation]
-- Competitive Positioning: [Head-to-head comparisons with specific trial results when available]
-- Development Stage Context: [What this means for next steps, upcoming catalysts, risk factors]
+Standout Points:
+[THIS IS THE MEATIEST SECTION - Include ALL quantifiable data and detailed analysis:
+• FINANCIAL METRICS: Exact dollar amounts, percentages, market size estimates, milestone payments, revenue figures
+• CLINICAL DATA: Patient numbers (n=X), response rates, p-values, confidence intervals, survival data, safety profiles
+• OPERATIONAL DETAILS: Trial sizes, enrollment timelines, dosing regimens, administration routes, study duration
+• SCIENTIFIC SPECIFICS: Mechanism of action, molecular targets, competitive advantages, differentiation factors  
+• REGULATORY INFO: FDA pathway details, submission timelines, breakthrough designations, approval probability factors
+• MARKET CONTEXT: Competitive landscape positioning, addressable market size, treatment standard comparisons
+Use bullet points and organize by category. This section should contain the most detailed, investment-relevant information.]
 
 Additional Developments:
-[Forward-looking strategic implications: partnership potential, label expansion opportunities, acquisition likelihood, pipeline impact, upcoming catalysts with specific dates, analyst target price changes, competitive responses expected]
+[Related partnerships, collaborations, strategic initiatives, regulatory updates, or broader market context beyond the main news event. Include forward-looking strategic implications.]
 
-INVESTMENT-FOCUSED REQUIREMENTS:
-✓ Assess potential stock impact and valuation implications
-✓ Identify key regulatory risks and upcoming catalysts  
-✓ Evaluate competitive positioning with specific data comparisons
-✓ Consider partnership/acquisition implications
-✓ Translate scientific findings into business implications
-✓ Define medical terminology for non-technical investors
-✓ Include current market context and analyst sentiment when mentioned
-
-SCIENTIFIC CONTEXT REQUIREMENTS:
-✓ Explain mechanism of action in investor-friendly terms
-✓ Define the disease/condition and unmet medical need size
-✓ Clarify drug type (small molecule, biologic, gene therapy, etc.)
-✓ Explain why specific endpoints matter for commercial success
-✓ Provide development stage context and de-risk next steps
-
-TARGET: Create summaries that help biotech investors quickly assess material impact on company prospects, competitive position, and valuation potential.
+CRITICAL REQUIREMENTS:
+- EXACTLY 600 words total (550-650 range acceptable)
+- "Standout Points" must be the longest, most detailed section
+- Include EVERY number, percentage, dollar amount, and timeline from the article
+- Explain scientific terms in investment context
+- Use bullet points in Standout Points for clarity
+- Each section must provide unique, non-repetitive information
+- Focus on investment decision-making relevance
 """
 
-# Enhanced Investment Analysis Prompt Template
+# Analysis Prompt for Additional Investment Analysis Section
 ANALYSIS_PROMPT = """
-DEEP INVESTMENT ANALYSIS
+You are providing additional analysis on why this healthcare/biotech news event is interesting and its implications for investors.
 
-Based on the following biotech news summary, provide comprehensive investment analysis for this selected high-impact event:
+ARTICLE TITLE: {article_title}
+COMPANY: {company_name}
+NEWS SUMMARY: {summary}
 
-{summary}
+Provide additional analysis focusing on:
 
-REQUIRED ANALYSIS STRUCTURE (400-500 words):
+1. WHY YOU FIND THIS EVENT INTERESTING
+- What makes this news stand out from typical industry developments?
+- Why should investors pay attention to this specific event?
+- What unique aspects make this particularly noteworthy?
 
-**Investment Thesis Impact:**
-Explain why this event is material for investors and could drive significant stock movement. Include specific catalysts, risk factors, and potential magnitude of impact on company valuation.
+2. POTENTIAL IMPLICATIONS (Think longer term)
+- What this may mean or impact the company (good, bad, or indifferent)
+- How this positions the company competitively
+- Regulatory pathway implications
+- Market opportunity sizing and addressability
+- Partnership/acquisition potential
+- Platform technology implications
 
-**Quantitative Assessment:**
-- Revenue Impact: Estimate potential revenue contribution (peak sales, market penetration assumptions)
-- Timeline to Value: When investors can expect material financial impact
-- Probability of Success: Risk-adjusted probability based on clinical stage, competitive landscape
-- Valuation Implications: How this could affect DCF models, peer comparisons, or sum-of-parts analysis
+3. ADDITIONAL RESEARCH & INSIGHTS
+- Context from comparable companies or precedent transactions
+- Competitive landscape analysis
+- Market dynamics that make this relevant
+- Technical or scientific background that adds context
 
-**Competitive Dynamics:**
-- Market Position: How this strengthens/weakens competitive moat
-- Competitive Response: Likely actions from key competitors and timeline
-- Differentiation Sustainability: Durability of competitive advantages
-- Market Share Implications: Potential for market expansion vs. share shift
+CRITICAL REQUIREMENTS:
+- Cite sources for any external research beyond the original article
+- Include direct quotes and figures when relevant
+- Provide specific, quantifiable insights where possible
+- Focus on investment relevance and materiality
+- Explain complex mechanisms/science in investor-friendly terms
+- Consider both near-term catalysts and long-term strategic value
 
-**Regulatory & Commercial Risk Assessment:**
-- FDA Pathway Risks: Key regulatory hurdles and probability of approval
-- Commercial Execution Risks: Manufacturing, market access, pricing pressures
-- Partnership Implications: Likelihood of strategic partnerships or acquisition interest
-- Patent/IP Considerations: Exclusivity timeline and competitive threat window
+RESEARCH SOURCING:
+- When referencing data not in the original article, clearly indicate the source
+- Use phrases like "According to [source]..." or "Industry data shows..."
+- Distinguish between facts from the press release vs. external research
 
-**Strategic Context & Catalysts:**
-- Pipeline Implications: How this affects broader development strategy
-- Platform Technology: Applicability to other indications or programs
-- Upcoming Catalysts: Next 6-12 months key events with specific dates
-- Long-term Strategic Value: 3-5 year outlook for this asset/program
+Target length: 400-600 words of additional analysis beyond the original summary.
+"""
 
-**Industry Context:**
-- Sector Trends: How this fits into broader biotech/healthcare investment themes
-- Precedent Analysis: Similar deals, partnerships, or clinical outcomes for context
-- Market Dynamics: Addressable market evolution, payer landscape changes
-- Technology Trends: Emerging competitive technologies or treatment paradigms
+# Company Research Prompt Template
+COMPANY_RESEARCH_PROMPT = """
+REAL-TIME COMPANY INTELLIGENCE RESEARCH
 
-**Investment Recommendation Framework:**
-- Bull Case: Best-case scenario with specific value drivers and timeline
-- Bear Case: Key risks that could derail investment thesis
-- Base Case: Most likely outcome with probability-weighted expectations
-- Key Monitoring Points: Specific metrics/events to track for thesis validation
+Company: {company_name}
+Ticker: {ticker}
 
-Focus on actionable insights that help portfolio managers make buy/sell/hold decisions and position sizing. Include specific price targets, revenue estimates, and timeline expectations where possible.
+Provide comprehensive, up-to-date intelligence on this healthcare/biotech company:
+
+**CURRENT FINANCIAL STATUS**
+- Stock price and recent performance (1M, 3M, 6M, 1Y)
+- Market cap, enterprise value, and key ratios
+- Cash position and runway analysis
+- Recent earnings highlights and guidance
+- Analyst consensus ratings and price targets
+
+**PIPELINE & DEVELOPMENT STATUS**  
+- Key programs by development phase
+- Recent clinical trial updates and data readouts
+- Regulatory milestones and FDA interactions
+- Partnership and collaboration updates
+- Patent/IP status and competitive positioning
+
+**RECENT NEWS & CATALYSTS**
+- Major announcements in past 30 days
+- Upcoming investor events and conferences
+- Management presentations and guidance updates
+- Competitor actions affecting market position
+- Industry trends impacting the company
+
+**INVESTMENT SENTIMENT**
+- Institutional ownership changes
+- Recent insider trading activity
+- Wall Street analyst commentary
+- Social media and retail investor sentiment
+- Short interest and options activity
+
+Prioritize information from the last 30 days and focus on factors that could impact investment decisions.
 """
 
 # Logging Configuration
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
-LOG_FILE = os.path.join(os.path.dirname(__file__), 'healthcare_news.log') 
+LOG_FILE = os.path.join(os.path.dirname(__file__), 'healthcare_news.log')
+
+# Financial API Keys (for stock ticker intelligence)
+# Get free API keys from:
+# - Financial Modeling Prep: https://financialmodelingprep.com/developer/docs/
+# - Alpha Vantage: https://www.alphavantage.co/support/#api-key
+# - News API: https://newsapi.org/register
+FMP_API_KEY = os.getenv('FMP_API_KEY', '')
+ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY', '')
+NEWS_API_KEY = os.getenv('NEWS_API_KEY', '') 

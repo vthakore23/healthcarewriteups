@@ -1,158 +1,217 @@
-# 🧬 Healthcare Writeups
+# 🧬 Healthcare Investment Intelligence Platform
 
-**AI-powered daily healthcare news analysis platform that generates comprehensive investment intelligence writeups from Life Science Report and other healthcare sources.**
-
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Flask](https://img.shields.io/badge/Flask-2.3.3-green.svg)](https://flask.palletsprojects.com/)
-[![OpenAI GPT-4](https://img.shields.io/badge/AI-GPT--4-orange.svg)](https://openai.com/)
-
-## ✨ Features
-
-- 🚀 **One-Click Analysis** - Beautiful web interface for easy operation
-- 📊 **Real-Time Progress** - Live updates during analysis
-- 💎 **Investment-Grade Reports** - Professional 600-word structured summaries
-- 🎯 **Smart Article Selection** - Automatically identifies most interesting events
-- 📱 **Modern Web Interface** - Clean, responsive dashboard
-- 📁 **Multiple Export Formats** - HTML (beautiful) and JSON (data) reports
-- 🕐 **Scheduled Analysis** - Runs at 7:01 AM, 8:00 AM, 9:00 AM ET
-- ⚡ **Optimized Performance** - Parallel processing for 3-5x faster analysis
-
-## 🎯 What It Does
-
-1. **Discovers New Articles** - Automatically scrapes lifesciencereport.com/newsroom
-2. **Generates Professional Summaries** - Creates 600-word structured analysis for each article
-3. **Intelligent Event Selection** - Picks 1-2 most interesting developments
-4. **Deep Investment Analysis** - Provides detailed insights on implications and opportunities
-5. **Beautiful Report Generation** - Creates stunning HTML reports ready to share
-6. **Real-Time Dashboard** - Monitor progress and download reports instantly
+A comprehensive real-time intelligence platform for pharmaceutical and biotech investment analysis, providing **social sentiment analysis**, **stock intelligence**, and **executive credibility tracking** - all powered by real APIs with no demo data.
 
 ## 🚀 Quick Start
 
-### Web Interface (Recommended)
+### 1. Clone & Setup
 ```bash
-./start_interface.sh
-```
-Opens at `http://localhost:5000` with:
-- One-click analysis execution
-- Real-time progress tracking
-- Report management dashboard
-- Instant download capabilities
-
-### Command Line
-```bash
-./run_daily_analysis.sh
+git clone <repository-url>
+cd healthcarewriteups
+pip install -r requirements.txt
 ```
 
-## 🛠️ Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/vthakore23/healthcare-news-automation.git
-   cd healthcare-news-automation
-   ```
-
-2. **Set up environment**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-3. **Configure API keys**
-   Create a `.env` file:
-   ```bash
-   OPENAI_API_KEY=your_openai_api_key_here
-   ANTHROPIC_API_KEY=your_anthropic_api_key_here
-   ```
-
-4. **Run the application**
-   ```bash
-   ./start_interface.sh
-   ```
-
-## 📋 Report Structure
-
-Each analysis includes:
-
-### Article Summaries
-- **Company Name** - Target organization
-- **News Event** - Type of development (earnings, data release, partnership, etc.)
-- **News Summary** - 5-sentence overview with key figures and implications
-- **Standout Points** - Quantifiable data and unique aspects affecting valuation
-- **Additional Developments** - Related partnerships, acquisitions, collaborations
-
-### Deep Analysis
-- **Investment Significance** - Why the event matters to investors
-- **Potential Implications** - Long-term financial and competitive impacts
-- **Additional Insights** - Industry context, technical background, precedents
-
-## 🔧 Configuration
-
-Key settings in `config.py`:
-- **Schedule Times** - Customize analysis schedule
-- **Word Counts** - Adjust summary lengths
-- **AI Models** - Switch between GPT-4 and Claude
-- **Article Filtering** - Configure source parameters
-
-## 📁 Output Files
-
-Reports are saved in the `reports/` directory:
-- `report_YYYY-MM-DD.html` - Beautiful formatted report
-- `report_YYYY-MM-DD.json` - Raw data for further processing
-
-## 🛡️ Security
-
-- API keys stored in environment variables
-- No sensitive data committed to repository
-- Local processing ensures data privacy
-- Comprehensive .gitignore for security
-
-## 🚀 Performance
-
-- **Parallel Processing** - 3-5x faster than sequential analysis
-- **Smart Caching** - Avoids reprocessing duplicate articles
-- **Rate Limit Handling** - Automatic retry with exponential backoff
-- **Memory Efficient** - Optimized for large-scale article processing
-
-## 📊 Tech Stack
-
-- **Backend** - Python 3.8+, Flask
-- **AI** - OpenAI GPT-4, Anthropic Claude
-- **Web Scraping** - BeautifulSoup, Selenium
-- **Frontend** - HTML5, CSS3, Vanilla JavaScript
-- **Data** - JSON, HTML export formats
-
-## 🕐 Scheduling
-
-For automated daily analysis:
+### 2. Configure API Keys
 ```bash
-python3 main_optimized.py --schedule
+cp env.example .env
+# Edit .env with your API keys:
+# - TWITTER_BEARER_TOKEN (required for Twitter data)
+# - ANTHROPIC_API_KEY (required for AI analysis)
+# - OPENAI_API_KEY (optional backup AI)
+# - NEWS_API_KEY (optional news data)
 ```
 
-Runs automatically at:
-- 7:01 AM Eastern Time
-- 8:00 AM Eastern Time  
-- 9:00 AM Eastern Time
+### 3. Run Platform
+```bash
+./run_platform.sh
+# Access: http://localhost:5001
+```
+
+## 📊 Platform Features
+
+### 🐦 Social Sentiment Analysis
+- **Real Twitter API v2** integration with Bearer Token
+- **Reddit web scraping** (50+ posts per drug query)
+- **StockTwits financial sentiment**
+- **Enhanced content filtering** for medical relevance
+- **Real-time sentiment scoring** with Claude AI
+
+### 📈 Stock Intelligence  
+- **Multi-source stock data** with smart fallbacks
+- **Real-time price analysis** via yfinance + web scraping
+- **Technical indicators** (moving averages, volatility)
+- **Investment signals** (Buy/Sell/Hold recommendations)
+- **Rate limit handling** with multiple data sources
+
+### 👔 Executive Credibility
+- **Real executive data** from company filings
+- **Recent news analysis** for executive mentions
+- **Multi-source data collection** (yfinance + news APIs)
+- **Company metrics integration**
+
+## 🔧 Technical Architecture
+
+### Core Components
+- **Flask Web Framework** - REST APIs + web interface
+- **Real-time Data Sources** - Twitter, Reddit, yfinance, news APIs
+- **AI Analysis** - Anthropic Claude + OpenAI GPT integration
+- **Smart Caching** - SQLite databases for performance
+- **Rate Limiting** - Intelligent backoff and fallback strategies
+
+### Data Flow
+1. **Input**: Drug name or stock ticker
+2. **Collection**: Multi-platform real-time data gathering
+3. **Filtering**: Medical relevance validation
+4. **Analysis**: AI-powered sentiment and trend analysis
+5. **Output**: Interactive dashboard with charts and insights
+
+## 📋 API Endpoints
+
+### Social Sentiment
+- `GET /api/drug_sentiment_with_posts/{drug_name}` - Complete sentiment analysis
+- `GET /api/search_drugs?q={query}` - Drug name search
+
+### Stock Intelligence
+- `GET /api/search_ticker?ticker={symbol}` - Stock analysis
+- Returns: Real-time price, technical indicators, investment signals
+
+### Executive Credibility
+- `GET /api/executive_credibility/{ticker}` - Executive analysis
+- Returns: Executive data, recent news, company metrics
+
+## 🌟 Key Differentiators
+
+### ✅ **100% Real Data**
+- No demo data or mock responses
+- All results from live APIs and web scraping
+- Real-time social media sentiment analysis
+
+### ✅ **Advanced Rate Limiting**
+- Smart fallback data sources
+- Intelligent backoff strategies
+- Multiple API redundancy
+
+### ✅ **Medical Context Filtering**
+- Spam and promotional content removal
+- Medical relevance scoring
+- Context extraction for drug discussions
+
+### ✅ **Comprehensive Coverage**
+- Social media (Twitter, Reddit, StockTwits)
+- Financial data (real-time stock prices)
+- Executive intelligence (news + filings)
+- AI-powered analysis and insights
+
+## 🛠 Installation & Setup
+
+### Prerequisites
+- Python 3.9+
+- Active internet connection
+- API keys (see Configuration section)
+
+### Dependencies
+```bash
+# Core dependencies
+flask>=2.0.0
+pandas>=1.3.0
+numpy>=1.21.0
+yfinance>=0.2.0
+tweepy>=4.0.0
+anthropic>=0.5.0
+beautifulsoup4>=4.10.0
+plotly>=5.0.0
+requests>=2.25.0
+```
+
+### Configuration
+1. **Twitter API** - Get Bearer Token from developer.twitter.com
+2. **Anthropic API** - Get API key from console.anthropic.com  
+3. **Optional APIs** - OpenAI, News API for enhanced functionality
+
+## 📈 Usage Examples
+
+### Social Sentiment Analysis
+```bash
+# Search for drug sentiment
+curl "http://localhost:5001/api/drug_sentiment_with_posts/Ozempic"
+
+# Returns: Real tweets, Reddit posts, sentiment analysis, charts
+```
+
+### Stock Intelligence
+```bash
+# Get stock analysis
+curl "http://localhost:5001/api/search_ticker?ticker=MRNA"
+
+# Returns: Real-time price, technical analysis, investment signals
+```
+
+### Executive Credibility
+```bash
+# Analyze executives
+curl "http://localhost:5001/api/executive_credibility/PFE"
+
+# Returns: Executive data, recent news, company metrics
+```
+
+## 🚀 Deployment
+
+### Local Development
+```bash
+python3 web_interface_enhanced_social.py
+```
+
+### Production Deployment
+```bash
+# Use a production WSGI server
+gunicorn --bind 0.0.0.0:5001 web_interface_enhanced_social:app
+```
+
+## 📊 Project Structure
+```
+healthcarewriteups/
+├── web_interface_enhanced_social.py  # Main Flask application
+├── social_media_sentiment.py        # Sentiment analysis engine
+├── real_data_scraper.py             # Multi-platform data scraper
+├── stock_ticker_intelligence.py     # Stock analysis engine
+├── templates/                       # Frontend templates
+├── cache/                          # Data cache
+├── reports/                        # Generated reports
+└── requirements.txt                # Dependencies
+```
+
+## 🔍 Troubleshooting
+
+### Common Issues
+1. **Twitter API Rate Limits** - Platform implements 60s backoff automatically
+2. **Stock Data Rate Limits** - Multiple fallback sources implemented
+3. **Missing API Keys** - Check .env file configuration
+4. **No Data Found** - Verify ticker symbols and drug names
+
+### Debug Mode
+```bash
+export FLASK_DEBUG=1
+python3 web_interface_enhanced_social.py
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+3. Implement changes with tests
+4. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙋‍♂️ Support
+## 🆘 Support
 
-For questions or issues:
-1. Check the [Issues](https://github.com/vthakore23/healthcare-news-automation/issues) page
-2. Create a new issue with detailed information
-3. Include logs and error messages when applicable
+For issues and questions:
+1. Check the troubleshooting section
+2. Review the API setup documentation
+3. Open an issue on GitHub
 
 ---
 
-**Built for healthcare investment professionals who need reliable, comprehensive news analysis.** 
+**Built with real data, real APIs, and real intelligence for healthcare investment decisions.** 
